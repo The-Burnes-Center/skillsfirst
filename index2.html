@@ -1,0 +1,227 @@
+<script>
+/* ── CONFIG ── */
+const minR = 20, maxR = 70,
+      cardW = 200, cardH = maxR*2 + 130, leftMargin = 40;
+
+const colour = d3.scaleOrdinal();            // domain set after data load
+const safe   = s => s.replace(/[^a-zA-Z0-9_-]/g, "-");
+
+let active   = new Set();                    // filled after data load
+let sortAsc  = false;
+let pctMode  = "gte";
+let pctThresh = 0;
+
+/* DATA */
+d3.csv("degrees.csv", d3.autoType).then(rows => {
+
+  /* normalise column names just once */
+  rows.forEach(r => {
+    r.license = r["License Type"]?.trim();
+    r.status  = r["Degree Required Status"]?.trim();
+  });
+
+  /* collect all status categories present in the file */
+  const degrees = Array.from(
+    new Set(rows.map(d => d.status))
+  ).sort();                 // simple alpha order – change if you need a custom order
+
+  /* colour & legend now know the real domain */
+  colour.domain(degrees).range(d3.schemeDark2.slice(0, degrees.length));
+  active = new Set(degrees);
+
+  /* roll-up: count how many rows per (license,status) combo */
+  const rolled = d3.rollup(
+    rows,
+    v => v.length,
+    d => d.license,
+    d => d.status
+  );
+
+  const pie = d3.pie().value(d => d.value).sort(null);
+
+  /* ── LEGEND ── */
+  d3.select("#legend").selectAll("span.swatch")
+    .data(degrees)
+    .enter().append("span")
+      .attr("class", "swatch")
+      .style("display", "flex")
+      .style("align-items", "center")
+      .style("cursor", "pointer")
+      .on("click", (e, deg) => {
+        active.has(deg) ? active.delete(deg) : active.add(deg);
+        d3.select(`.sw-${safe(deg)}`)
+          .style("opacity", active.has(deg) ? 1 : 0.25);
+        redraw();
+      })
+      .html(d => `
+        <span class="sw-${safe(d)}"
+              style="width:16px;height:16px;margin-right:6px;
+                     background:${colour(d)};border:1px solid #000"></span>
+        <span>${d}</span>`);
+
+  /* ── UI LISTENERS (sort, slider, etc.) ── */
+  d3.select("#sort-btn")
+    .on("click", () => { sortAsc = !sortAsc;
+       d3.select("#sort-btn").text(`Sort ${sortAsc ? "↑" : "↓"}`);
+       redraw();
+    });
+
+  d3.select("#pct-slider").on("input", function () {
+    pctThresh = +this.value;
+    d3.select("#pct-val").text(`${pctThresh} %`);
+    redraw();
+  });
+
+  d3.select("#pct-mode")
+    .on("change", function () { pctMode = this.value; redraw(); });
+
+  const svg = d3.select("#chart");
+  redraw();
+  d3.select(window).on("resize", debounce(redraw, 150));
+  document
+    .querySelectorAll('input[name=hole]')
+    .forEach(r => r.addEventListener('change', redraw));
+
+  /* ── REDRAW ── */
+  function redraw() {
+    const vw   = document.body.clientWidth,
+          cols = Math.max(1, Math.floor((vw - leftMargin) / cardW));
+
+    /* per-license stats (total rows, rows in active categories, percentage) */
+    const licStats = Array.from(rolled, ([lic, m]) => {
+        const total     = d3.sum(degrees, k => m.get(k) || 0),
+              activeTot = d3.sum([...active], k => m.get(k) || 0),
+              pct       = total ? activeTot / total : 0;
+        return { lic, total, activeTot, pct };
+      })
+      .filter(d => {
+        if (d.activeTot === 0) return false;  // drop fully white pies
+        return pctMode === "gte"
+             ? d.pct * 100 >= pctThresh
+             : d.pct * 100 <= pctThresh;
+      })
+      .sort((a, b) =>
+        sortAsc ? d3.ascending(a.pct, b.pct)
+                : d3.descending(a.pct, b.pct)
+      );
+
+    d3.select("#lic-count").text(`${licStats.length} licences displayed`);
+
+    const radius = d3.scaleSqrt()
+      .domain([
+        d3.min(licStats, d => d.activeTot) || 1,
+        d3.max(licStats, d => d.activeTot) || 1
+      ])
+      .range([minR, maxR]);
+
+    /* SVG canvas */
+    const rowsN = Math.ceil(licStats.length / cols);
+    svg.attr("viewBox", `0 0 ${vw} ${rowsN * cardH + 100}`)
+       .selectAll("*").remove();
+
+    const g = svg.append("g")
+                 .attr("transform", `translate(${leftMargin},0)`);
+
+    /* ── CARDS ── */
+    const cards = g.selectAll("g.card")
+      .data(licStats)
+      .enter().append("g")
+        .attr("class", "card")
+        .attr("transform", (d, i) => {
+          const col = i % cols,
+                row = Math.floor(i / cols),
+                R   = radius(d.activeTot);
+          return `translate(${col * cardW + R},
+                            ${row * cardH + R + 40})`;
+        });
+
+    cards.append("circle")
+      .attr("r", d => radius(d.activeTot))
+      .attr("fill", "#fff")
+      .attr("stroke", "#ddd");
+
+    /* ── PIE SLICES ── */
+    cards.each(function (d) {
+      const R   = radius(d.activeTot),
+            arc = d3.arc()
+                     .innerRadius(+document
+                       .querySelector('input[name=hole]:checked').value)
+                     .outerRadius(R - 2);
+
+      const data = degrees.map(k => ({
+        key:   k,
+        value: rolled.get(d.lic).get(k) || 0,
+        on:    active.has(k)
+      }));
+
+      d3.select(this).selectAll("path")
+        .data(pie(data), s => s.data.key)
+        .join("path")
+          .attr("fill", s => s.data.on ? colour(s.data.key) : "#fff")
+          .attr("stroke", s => s.data.on ? "#fff" : "#ccc")
+        .transition().duration(400)
+          .attrTween("d", function (s) {
+            const i = d3.interpolate(this._current || s, s);
+            this._current = i(1);
+            return t => arc(i(t));
+          });
+    });
+
+    /* ── LABELS ── */
+    cards.selectAll("text.label")
+      .data(d => [d])
+      .join(enter => enter.append("text").attr("class", "label"))
+        .attr("y", d => radius(d.activeTot) + 20)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .each(function (d) {
+          const boxW = Math.max(120, radius(d.activeTot) * 1.8),
+                sel  = d3.select(this).text(null);
+
+          sel.append("tspan").attr("x", 0)
+             .text(`${(d.pct * 100).toFixed(0)} %`);
+          sel.append("tspan").attr("x", 0).attr("dy", "1.2em")
+             .text(`${d.activeTot} of ${d.total}`);
+          sel.append("tspan").attr("x", 0).attr("dy", "1.2em")
+             .attr("font-weight", "700")
+             .call(span => wrap(span, d.lic, boxW));
+        });
+
+    /* tooltips */
+    cards.selectAll("path")
+         .on("mouseover", (e, s) =>
+            showTip(e, s.data.key, s.data.value))
+         .on("mouseout",  hideTip);
+  }
+
+  /* ── HELPERS ── */
+  function wrap(tspanSel, str, width) {
+    const words = str.split(/\s+/);
+    tspanSel.text(null);
+    let line = [], tspan = tspanSel;
+    words.forEach(w => {
+      line.push(w); tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop(); tspan.text(line.join(" "));
+        line = [w];
+        tspan = tspanSel.append("tspan")
+                        .attr("x", 0).attr("dy", "1.2em")
+                        .text(w);
+      }
+    });
+  }
+
+  function showTip(e, l, v) {
+    d3.select("#tip").style("opacity", .9)
+      .html(`<strong>${l}</strong><br>${v} source${v === 1 ? "" : "s"}`)
+      .style("left",  (e.pageX + 10) + "px")
+      .style("top",   (e.pageY - 28) + "px");
+  }
+  function hideTip()  { d3.select("#tip").style("opacity", 0); }
+  const debounce = (fn, ms) => {
+    let id; return (...a) => {
+      clearTimeout(id); id = setTimeout(() => fn(...a), ms);
+    };
+  };
+});
+</script>
