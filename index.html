@@ -6,8 +6,8 @@
 
 <!-- ─ controls bar ─ -->
 <div id="controls" style="padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:14px">
-  <span style="opacity:0;"><label><input type="radio" name="hole" value="0" checked> Pie</label></span>
-<!--   <span><label><input type="radio" name="hole" value="18"> Donut</label></span> -->
+  <span style="opacity: 0;"><label><input type="radio" name="hole" value="0" checked> Pie</label></span>
+  <!-- <span><label><input type="radio" name="hole" value="18"> Donut</label></span> -->
 
   <div id="legend" style="display:flex;flex-wrap:wrap;gap:10px;margin-left:30px"></div>
 
@@ -32,7 +32,7 @@
 <script>
 /* ── CONFIG ── */
 const minR = 20, maxR = 70,
-      cardW = 200, cardH = maxR*2 + 60, leftMargin = 40;
+      cardW = 200, cardH = maxR*2 + 130, leftMargin = 40;
 const degrees = [
   "Explicit Bachelor's","Explicit Graduate/Professional",
   "Implicit Bachelor's","Implicit Associate's",
@@ -151,7 +151,7 @@ d3.csv("degrees.csv", d3.autoType).then(rows=>{
            const sel=d3.select(this).text(null);
            sel.append("tspan").attr("x",0).text(`${(d.pct*100).toFixed(0)} %`);
            sel.append("tspan").attr("x",0).attr("dy","1.2em").text(`${d.activeTot} of ${d.total}`);
-           sel.append("tspan").attr("x",0).attr("dy","1.2em")
+           + sel.append("tspan").attr("x",0).attr("dy","1.2em").attr("font-weight","700")
               .call(span=>wrap(span,d.lic,boxW));
         });
 
