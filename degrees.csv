@@ -1,0 +1,245 @@
+licenseType,degreeRequiredStatus,amount of single degreeRequiredStatus per license,how many degreeStatus per license
+Actuarial License,Explicit Bachelor's,1,2
+Actuarial License,No Degree Found,3,2
+Administrative Certificate,Could Not Determine,2,4
+Administrative Certificate,Explicit Bachelor's,1,4
+Administrative Certificate,Explicit Graduate/Professional,25,4
+Administrative Certificate,No Degree Found,2,4
+Advanced Nurse Practitioner License,Could Not Determine,1,3
+Advanced Nurse Practitioner License,Explicit Graduate/Professional,14,3
+Advanced Nurse Practitioner License,No Degree Found,5,3
+Advanced Practice Nurse,Could Not Determine,1,3
+Advanced Practice Nurse,Explicit Graduate/Professional,14,3
+Advanced Practice Nurse,No Degree Found,5,3
+Agricultural Inspection Licence,Explicit Bachelor's,1,2
+Agricultural Inspection Licence,No Degree Found,3,2
+Agricultural Inspection License,Explicit Bachelor's,1,2
+Agricultural Inspection License,No Degree Found,2,2
+Air Conditioning and Refrigeration Technician Certification,Could Not Determine,1,3
+Air Conditioning and Refrigeration Technician Certification,Explicit Bachelor's,1,3
+Air Conditioning and Refrigeration Technician Certification,No Degree Found,26,3
+Airframe and Powerplant Certificate,No Degree Found,10,1
+Airport Executive Licence,No Degree Found,3,1
+Asbestos Safety Technician,Could Not Determine,2,2
+Asbestos Safety Technician,No Degree Found,19,2
+Audio Engineering License,No Degree Found,2,1
+Barber License,No Degree Found,12,1
+Behavior Analyst License,Could Not Determine,2,4
+Behavior Analyst License,Explicit Bachelor's,1,4
+Behavior Analyst License,Explicit Graduate/Professional,56,4
+Behavior Analyst License,No Degree Found,1,4
+Black Seal Boiler Operator License,No Degree Found,9,1
+Boiler Operator License,No Degree Found,8,1
+Certified Alcohol and Drug Counselor,Could Not Determine,3,4
+Certified Alcohol and Drug Counselor,Explicit Bachelor's,2,4
+Certified Alcohol and Drug Counselor,Implicit Bachelor's,2,4
+Certified Alcohol and Drug Counselor,No Degree Found,44,4
+Certified Court Reporter,Could Not Determine,1,2
+Certified Court Reporter,No Degree Found,12,2
+Certified Financial Examiner,Could Not Determine,1,3
+Certified Financial Examiner,Explicit Bachelor's,1,3
+Certified Financial Examiner,No Degree Found,2,3
+Certified Municipal Finance Officer,No Degree Found,15,1
+Certified Nurse Aide,No Degree Found,16,1
+Certified Pesticide Applicator,No Degree Found,2,1
+Certified Public Accountant,Could Not Determine,3,4
+Certified Public Accountant,Explicit Bachelor's,61,4
+Certified Public Accountant,Implicit Bachelor's,1,4
+Certified Public Accountant,No Degree Found,8,4
+Certified Rehabilitation Counselor,Could Not Determine,1,3
+Certified Rehabilitation Counselor,Explicit Graduate/Professional,13,3
+Certified Rehabilitation Counselor,No Degree Found,6,3
+Certified Tumor Registrar,Explicit Associate's,3,2
+Certified Tumor Registrar,No Degree Found,8,2
+Certified Welding Inspector,No Degree Found,20,1
+Clergy License,Explicit Graduate/Professional,1,2
+Clergy License,No Degree Found,5,2
+Clinical Laboratory Technician License,Could Not Determine,3,4
+Clinical Laboratory Technician License,Explicit Associate's,6,4
+Clinical Laboratory Technician License,Explicit Bachelor's,4,4
+Clinical Laboratory Technician License,No Degree Found,8,4
+Commercial Radio Operator License,No Degree Found,4,1
+Construction Official License,Could Not Determine,3,2
+Construction Official License,No Degree Found,11,2
+Cosmetologist-Hairstylist License,No Degree Found,15,1
+Counselor License,Could Not Determine,1,5
+Counselor License,Explicit Bachelor's,3,5
+Counselor License,Explicit Graduate/Professional,37,5
+Counselor License,Implicit Bachelor's,3,5
+Counselor License,No Degree Found,6,5
+Court Interpreter Certification,No Degree Found,4,1
+Crane Operator License,No Degree Found,2,1
+Dance Therapist License,Could Not Determine,2,4
+Dance Therapist License,Explicit Graduate/Professional,11,4
+Dance Therapist License,Implicit Bachelor's,1,4
+Dance Therapist License,No Degree Found,1,4
+Dental Licence,Could Not Determine,1,5
+Dental Licence,Explicit Associate's,3,5
+Dental Licence,Explicit Graduate/Professional,9,5
+Dental Licence,Implicit Associate's,2,5
+Dental Licence,No Degree Found,3,5
+Diagnostic Radiologic Technologist License,Explicit Associate's,9,3
+Diagnostic Radiologic Technologist License,Implicit Associate's,4,3
+Diagnostic Radiologic Technologist License,No Degree Found,19,3
+Driver License,Explicit Bachelor's,1,2
+Driver License,No Degree Found,1,2
+Electrical Contractor License,No Degree Found,27,1
+Emergency Medical Technician,Could Not Determine,1,2
+Emergency Medical Technician,No Degree Found,18,2
+Emergency Medical Technician Certification,No Degree Found,33,1
+Engineer-In-Training,Could Not Determine,4,4
+Engineer-In-Training,Explicit Bachelor's,13,4
+Engineer-In-Training,Implicit Bachelor's,3,4
+Engineer-In-Training,No Degree Found,8,4
+Fire Inspector Certification,No Degree Found,12,1
+Fire Investigator Certification,No Degree Found,7,1
+Fire Official Certification,No Degree Found,7,1
+Firefighter Certification,No Degree Found,12,1
+Firefighter License,No Degree Found,8,1
+Home Energy Professional License,No Degree Found,4,1
+Hotel and Multiple Dwelling Inspector License,Could Not Determine,1,2
+Hotel and Multiple Dwelling Inspector License,No Degree Found,6,2
+Inspector License,Could Not Determine,1,2
+Inspector License,No Degree Found,19,2
+Instructional Certificate,Could Not Determine,11,6
+Instructional Certificate,Explicit Associate's,4,6
+Instructional Certificate,Explicit Bachelor's,29,6
+Instructional Certificate,Explicit Graduate/Professional,3,6
+Instructional Certificate,Implicit Bachelor's,1,6
+Instructional Certificate,No Degree Found,35,6
+Interpreter Certification,Could Not Determine,1,5
+Interpreter Certification,Explicit Associate's,9,5
+Interpreter Certification,Explicit Bachelor's,4,5
+Interpreter Certification,Implicit Bachelor's,2,5
+Interpreter Certification,No Degree Found,26,5
+Investigator License,No Degree Found,12,1
+Lactation Consultant License,Explicit Bachelor's,1,2
+Lactation Consultant License,No Degree Found,10,2
+Landscape Architect,Could Not Determine,2,5
+Landscape Architect,Explicit Bachelor's,8,5
+Landscape Architect,Explicit Graduate/Professional,2,5
+Landscape Architect,Implicit Bachelor's,1,5
+Landscape Architect,No Degree Found,3,5
+Law Licence,Explicit Graduate/Professional,7,1
+Licensed Practical Nurse,Could Not Determine,1,3
+Licensed Practical Nurse,Implicit Associate's,1,3
+Licensed Practical Nurse,No Degree Found,43,3
+Licensed Social Worker,Could Not Determine,5,4
+Licensed Social Worker,Explicit Graduate/Professional,28,4
+Licensed Social Worker,Implicit Bachelor's,2,4
+Licensed Social Worker,No Degree Found,5,4
+Mammography Certification,No Degree Found,10,1
+Medical Licence,Could Not Determine,4,4
+Medical Licence,Explicit Graduate/Professional,24,4
+Medical Licence,Implicit Associate's,1,4
+Medical Licence,No Degree Found,24,4
+Medicolegal Death Investigator Certification,Explicit Associate's,6,3
+Medicolegal Death Investigator Certification,Explicit Bachelor's,3,3
+Medicolegal Death Investigator Certification,No Degree Found,16,3
+Municipal Court Administrator certificate,Could Not Determine,1,2
+Municipal Court Administrator certificate,No Degree Found,5,2
+Notary Public,No Degree Found,19,1
+Nursing Home Administrator License,Explicit Bachelor's,3,2
+Nursing Home Administrator License,No Degree Found,5,2
+Occupational Therapist License,Could Not Determine,2,4
+Occupational Therapist License,Explicit Bachelor's,7,4
+Occupational Therapist License,Explicit Graduate/Professional,9,4
+Occupational Therapist License,No Degree Found,5,4
+Occupational Therapy Assistant License,Explicit Associate's,7,3
+Occupational Therapy Assistant License,Implicit Associate's,1,3
+Occupational Therapy Assistant License,No Degree Found,6,3
+Operating Engineer License,No Degree Found,8,1
+Operating Engineers License,No Degree Found,17,1
+Pharmacist Licence,Explicit Bachelor's,4,2
+Pharmacist Licence,Explicit Graduate/Professional,5,2
+Physical Therapist Assistant License,Could Not Determine,1,4
+Physical Therapist Assistant License,Explicit Associate's,12,4
+Physical Therapist Assistant License,Implicit Associate's,4,4
+Physical Therapist Assistant License,No Degree Found,9,4
+Physical Therapist License,Could Not Determine,2,4
+Physical Therapist License,Explicit Bachelor's,2,4
+Physical Therapist License,Explicit Graduate/Professional,17,4
+Physical Therapist License,No Degree Found,5,4
+Phytosanitary Certificate License,No Degree Found,1,1
+Pilot Licence,Explicit Bachelor's,2,2
+Pilot Licence,No Degree Found,11,2
+Plant Engineer License,Could Not Determine,1,3
+Plant Engineer License,Explicit Bachelor's,1,3
+Plant Engineer License,No Degree Found,1,3
+Professional Engineer,Explicit Bachelor's,17,3
+Professional Engineer,Implicit Bachelor's,4,3
+Professional Engineer,No Degree Found,13,3
+Professional Librarian,Could Not Determine,5,3
+Professional Librarian,Explicit Graduate/Professional,27,3
+Professional Librarian,No Degree Found,10,3
+Professional Nurse,Could Not Determine,10,5
+Professional Nurse,Explicit Associate's,8,5
+Professional Nurse,Explicit Bachelor's,3,5
+Professional Nurse,Implicit Associate's,2,5
+Professional Nurse,No Degree Found,31,5
+Professional Planner,Could Not Determine,7,3
+Professional Planner,Explicit Bachelor's,1,3
+Professional Planner,No Degree Found,28,3
+Psychology Licence,Could Not Determine,2,5
+Psychology Licence,Explicit Bachelor's,1,5
+Psychology Licence,Explicit Graduate/Professional,31,5
+Psychology Licence,Implicit Bachelor's,3,5
+Psychology Licence,No Degree Found,1,5
+Psychology License,Could Not Determine,1,4
+Psychology License,Explicit Graduate/Professional,34,4
+Psychology License,Implicit Bachelor's,3,4
+Psychology License,No Degree Found,3,4
+Racing Officials License,No Degree Found,2,1
+Real Estate License,No Degree Found,21,1
+Registered Architect,Could Not Determine,1,4
+Registered Architect,Explicit Bachelor's,11,4
+Registered Architect,Implicit Bachelor's,3,4
+Registered Architect,No Degree Found,3,4
+Registered Dietitian,Could Not Determine,4,5
+Registered Dietitian,Explicit Bachelor's,7,5
+Registered Dietitian,Explicit Graduate/Professional,20,5
+Registered Dietitian,Implicit Bachelor's,2,5
+Registered Dietitian,No Degree Found,15,5
+Registered Environmental Health Specialist,Could Not Determine,2,3
+Registered Environmental Health Specialist,Explicit Bachelor's,13,3
+Registered Environmental Health Specialist,No Degree Found,3,3
+Registered Health Information Administrator,Explicit Associate's,1,4
+Registered Health Information Administrator,Explicit Bachelor's,13,4
+Registered Health Information Administrator,Implicit Bachelor's,2,4
+Registered Health Information Administrator,No Degree Found,1,4
+Registered Health Information Technician,Could Not Determine,2,4
+Registered Health Information Technician,Explicit Associate's,10,4
+Registered Health Information Technician,Implicit Associate's,1,4
+Registered Health Information Technician,No Degree Found,3,4
+Registered Pharmacist License,Explicit Bachelor's,6,3
+Registered Pharmacist License,Explicit Graduate/Professional,11,3
+Registered Pharmacist License,No Degree Found,1,3
+Respiratory Care Practitioners License,Could Not Determine,2,6
+Respiratory Care Practitioners License,Explicit Associate's,5,6
+Respiratory Care Practitioners License,Explicit Bachelor's,1,6
+Respiratory Care Practitioners License,Implicit Associate's,5,6
+Respiratory Care Practitioners License,Implicit Bachelor's,1,6
+Respiratory Care Practitioners License,No Degree Found,22,6
+School Social Worker Certificate,Could Not Determine,3,4
+School Social Worker Certificate,Explicit Graduate/Professional,2,4
+School Social Worker Certificate,Implicit Bachelor's,1,4
+School Social Worker Certificate,No Degree Found,4,4
+Special Education Certificate,Explicit Bachelor's,21,4
+Special Education Certificate,Explicit Graduate/Professional,4,4
+Special Education Certificate,Implicit Bachelor's,8,4
+Special Education Certificate,No Degree Found,12,4
+Speech Language Pathology License,Could Not Determine,2,5
+Speech Language Pathology License,Explicit Bachelor's,6,5
+Speech Language Pathology License,Explicit Graduate/Professional,19,5
+Speech Language Pathology License,Implicit Bachelor's,1,5
+Speech Language Pathology License,No Degree Found,4,5
+Stationary Engineer License,No Degree Found,4,1
+Tax Assessor Certificate,No Degree Found,3,1
+Tax Collector Certificate,No Degree Found,9,1
+Veterinary Licence,Could Not Determine,2,5
+Veterinary Licence,Explicit Graduate/Professional,15,5
+Veterinary Licence,Implicit Associate's,1,5
+Veterinary Licence,Implicit Bachelor's,1,5
+Veterinary Licence,No Degree Found,9,5
+Water Plant Operator License,No Degree Found,5,1
+Weighmaster,Could Not Determine,1,1
