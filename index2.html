@@ -4,256 +4,239 @@
 
 <body style="margin:0;font-family:sans-serif;background:#fafafa">
 
-<!-- ─ controls bar ─ -->
-<div id="controls" style="padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:14px">
-  <span style="opacity: 0;"><label><input type="radio" name="hole" value="0" checked> Pie</label></span>
-  <!-- <span><label><input type="radio" name="hole" value="18"> Donut</label></span> -->
+<!-- ═══ controls bar ═══ -->
+<div id="controls"
+     style="padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+
+  <span style="opacity:0"><label><input type="radio" name="hole" value="0" checked>Pie</label></span>
 
   <div id="legend" style="display:flex;flex-wrap:wrap;gap:10px;margin-left:30px"></div>
 
-  <!-- percentage filter -->
+  <!-- coverage slider -->
   <span style="margin-left:20px">
-    <select id="pct-mode">
-      <option value="gte" selected>≥</option>
-      <option value="lte">≤</option>
-    </select>
+    <strong>Coverage&nbsp;%</strong>&nbsp;
+    <select id="pct-mode"><option value="gte" selected>≥</option><option value="lte">≤</option></select>
     <input id="pct-slider" type="range" min="0" max="100" value="0" style="vertical-align:middle">
-    <span id="pct-val">0 %</span>
+    <span id="pct-val">≥ 0&nbsp;%</span>
   </span>
 
-  <button id="sort-btn" style="margin-left:auto">Sort ↓</button>
-  <span id="lic-count" style="font-weight:600;margin-left:20px"></span>
+  <!-- Elo slider -->
+  <span style="margin-left:20px">
+    <strong>Elo&nbsp;rating</strong>&nbsp;
+    <select id="elo-mode"><option value="gte" selected>≥</option><option value="lte">≤</option></select>
+    <input id="elo-slider" type="range" min="0" max="1500" value="0"
+           style="vertical-align:middle;width:150px">
+    <span id="elo-val">≥ 0</span>
+  </span>
+
+  <!-- domain check-boxes (all UNchecked by default) -->
+  <span style="margin-left:20px">
+    <strong>Domain</strong>&nbsp;
+    <label><input class="dom-cb" type="checkbox" value=".gov">.gov</label>
+    <label><input class="dom-cb" type="checkbox" value=".edu">.edu</label>
+    <label><input class="dom-cb" type="checkbox" value=".law">.law</label>
+  </span>
+
+  <button id="sort-btn"  style="margin-left:auto">Sort ↓</button>
+  <button id="reset-btn">Reset</button>
+  <span   id="lic-count" style="font-weight:600;margin-left:20px"></span>
 </div>
 
 <svg id="chart" style="width:100%;height:auto;display:block"></svg>
-
-<div id="tip" style="position:absolute;padding:4px 8px;background:#fff;border:1px solid #666;border-radius:3px;font-size:12px;pointer-events:none;opacity:0;"></div>
+<div id="tip"
+     style="position:absolute;padding:4px 8px;background:#fff;border:1px solid #666;border-radius:3px;font-size:12px;pointer-events:none;opacity:0;"></div>
 
 <script>
-/* ── CONFIG ── */
-const minR = 20, maxR = 70,
-      cardW = 200, cardH = maxR*2 + 130, leftMargin = 40;
+/* CONFIG ------------------------------------------------------------------ */
+const minR=20,maxR=70,cardW=200,cardH=maxR*2+130,leftMargin=40;
+const degrees=[
+  "Explicit Bachelor's","Explicit Graduate/Professional",
+  "Implicit Bachelor's","Implicit Associate's",
+  "Could Not Determine","No Degree Found"
+];
+const colour=d3.scaleOrdinal(degrees,d3.schemeDark2.slice(0,6));
+const safe=s=>s.replace(/[^a-zA-Z0-9_-]/g,"-");
 
-const colour = d3.scaleOrdinal();            // domain set after data load
-const safe   = s => s.replace(/[^a-zA-Z0-9_-]/g, "-");
+/* UI state (reset-able) */
+let active,sortAsc,pctMode,pctThresh,eloMode,eloThresh,domains;
 
-let active   = new Set();                    // filled after data load
-let sortAsc  = false;
-let pctMode  = "gte";
-let pctThresh = 0;
+/* CSV --------------------------------------------------------------------- */
+d3.csv("degrees2.csv", r=>{
+  r["Elo Rating"]=+String(r["Elo Rating"]).replace(/,/g,"");
+  return r;
+}).then(rows=>{
 
-/* DATA */
-d3.csv("degrees2.csv", d3.autoType).then(rows => {
-
-  /* normalise column names just once */
-  rows.forEach(r => {
-    r.license = r["License Type"]?.trim();
-    r.status  = r["Degree Required Status"]?.trim();
-  });
-
-  /* collect all status categories present in the file */
-  const degrees = Array.from(
-    new Set(rows.map(d => d.status))
-  ).sort();                 // simple alpha order – change if you need a custom order
-
-  /* colour & legend now know the real domain */
-  colour.domain(degrees).range(d3.schemeDark2.slice(0, degrees.length));
-  active = new Set(degrees);
-
-  /* roll-up: count how many rows per (license,status) combo */
-  const rolled = d3.rollup(
-    rows,
-    v => v.length,
-    d => d.license,
-    d => d.status
-  );
-
-  const pie = d3.pie().value(d => d.value).sort(null);
-
-  /* ── LEGEND ── */
+  /* legend -------------------------------------------------------------- */
   d3.select("#legend").selectAll("span.swatch")
-    .data(degrees)
-    .enter().append("span")
-      .attr("class", "swatch")
-      .style("display", "flex")
-      .style("align-items", "center")
-      .style("cursor", "pointer")
-      .on("click", (e, deg) => {
-        active.has(deg) ? active.delete(deg) : active.add(deg);
-        d3.select(`.sw-${safe(deg)}`)
-          .style("opacity", active.has(deg) ? 1 : 0.25);
+    .data(degrees).enter().append("span")
+      .attr("class",d=>`swatch sw-${safe(d)}`)
+      .style("display","flex").style("align-items","center").style("cursor","pointer")
+      .on("click",(e,deg)=>{
+        active.has(deg)?active.delete(deg):active.add(deg);
+        d3.select(`.sw-${safe(deg)}`).style("opacity",active.has(deg)?1:0.25);
         redraw();
       })
-      .html(d => `
-        <span class="sw-${safe(d)}"
-              style="width:16px;height:16px;margin-right:6px;
-                     background:${colour(d)};border:1px solid #000"></span>
-        <span>${d}</span>`);
+      .html(d=>`<span style="width:16px;height:16px;margin-right:6px;background:${colour(d)};
+                 border:1px solid #000"></span><span>${d}</span>`);
 
-  /* ── UI LISTENERS (sort, slider, etc.) ── */
-  d3.select("#sort-btn")
-    .on("click", () => { sortAsc = !sortAsc;
-       d3.select("#sort-btn").text(`Sort ${sortAsc ? "↑" : "↓"}`);
-       redraw();
-    });
-
-  d3.select("#pct-slider").on("input", function () {
-    pctThresh = +this.value;
-    d3.select("#pct-val").text(`${pctThresh} %`);
+  /* controls ------------------------------------------------------------ */
+  d3.selectAll(".dom-cb").on("change",function(){
+    this.checked?domains.add(this.value):domains.delete(this.value);
     redraw();
   });
 
-  d3.select("#pct-mode")
-    .on("change", function () { pctMode = this.value; redraw(); });
+  d3.select("#sort-btn").on("click",()=>{sortAsc=!sortAsc;
+    d3.select("#sort-btn").text(`Sort ${sortAsc?"↑":"↓"}`); redraw();});
 
-  const svg = d3.select("#chart");
-  redraw();
-  d3.select(window).on("resize", debounce(redraw, 150));
-  document
-    .querySelectorAll('input[name=hole]')
-    .forEach(r => r.addEventListener('change', redraw));
+  d3.select("#pct-slider").on("input",function(){
+    pctThresh=+this.value;
+    d3.select("#pct-val").text(`${pctMode==="gte"?"≥":"≤"} ${pctThresh} %`);
+    redraw();
+  });
+  d3.select("#pct-mode").on("change",function(){
+    pctMode=this.value;
+    d3.select("#pct-val").text(`${pctMode==="gte"?"≥":"≤"} ${pctThresh} %`);
+    redraw();
+  });
 
-  /* ── REDRAW ── */
-  function redraw() {
-    const vw   = document.body.clientWidth,
-          cols = Math.max(1, Math.floor((vw - leftMargin) / cardW));
+  d3.select("#elo-slider").on("input",function(){
+    eloThresh=+this.value;
+    d3.select("#elo-val").text(`${eloMode==="gte"?"≥":"≤"} ${eloThresh}`);
+    redraw();
+  });
+  d3.select("#elo-mode").on("change",function(){
+    eloMode=this.value;
+    d3.select("#elo-val").text(`${eloMode==="gte"?"≥":"≤"} ${eloThresh}`);
+    redraw();
+  });
 
-    /* per-license stats (total rows, rows in active categories, percentage) */
-    const licStats = Array.from(rolled, ([lic, m]) => {
-        const total     = d3.sum(degrees, k => m.get(k) || 0),
-              activeTot = d3.sum([...active], k => m.get(k) || 0),
-              pct       = total ? activeTot / total : 0;
-        return { lic, total, activeTot, pct };
+  /* RESET button -------------------------------------------------------- */
+  d3.select("#reset-btn").on("click",()=>{setDefaults(); redraw();});
+
+  /* initial state + first paint (deferred) ------------------------------ */
+  setDefaults();
+  setTimeout(redraw,0);            // ← draw after paint cycle ends
+
+  /* ---------- functions ---------- */
+  function setDefaults(){
+    active     = new Set(degrees);
+    sortAsc    = false;
+    pctMode    = "gte"; pctThresh = 0;
+    eloMode    = "gte"; eloThresh = 0;
+    domains    = new Set();                        // none ticked
+    /* sliders / labels / check-boxes / legend opacity */
+    d3.select("#pct-slider").property("value",0);
+    d3.select("#pct-mode").property("value","gte");
+    d3.select("#pct-val").text("≥ 0 %");
+
+    d3.select("#elo-slider").property("value",0);
+    d3.select("#elo-mode").property("value","gte");
+    d3.select("#elo-val").text("≥ 0");
+
+    d3.selectAll(".dom-cb").property("checked",false);
+    d3.select("#sort-btn").text("Sort ↓");
+    degrees.forEach(d=>d3.select(`.sw-${safe(d)}`).style("opacity",1));
+  }
+
+  function redraw(){
+    /* filter rows ----------------------------------------------------- */
+    const rowsOK = rows.filter(r=>{
+      const okElo = eloMode==="gte"? r["Elo Rating"]>=eloThresh
+                                    : r["Elo Rating"]<=eloThresh;
+      const okDom = domains.size===0
+                    ? true
+                    : [...domains].some(suf=>(r["Source URL"]||"").includes(suf));
+      return okElo && okDom;
+    });
+
+    /* roll-up --------------------------------------------------------- */
+    const rolled=d3.rollup(rowsOK,
+        v=>v.length,
+        r=>r["License Type"],
+        r=>r["Degree Required Status"]);
+
+    const licStats=Array.from(rolled,([lic,m])=>{
+        const total=d3.sum(degrees,k=>m.get(k)||0);
+        const activeTot=d3.sum([...active],k=>m.get(k)||0);
+        const pct=total?activeTot/total:0;
+        return{lic,total,activeTot,pct};
       })
-      .filter(d => {
-        if (d.activeTot === 0) return false;  // drop fully white pies
-        return pctMode === "gte"
-             ? d.pct * 100 >= pctThresh
-             : d.pct * 100 <= pctThresh;
-      })
-      .sort((a, b) =>
-        sortAsc ? d3.ascending(a.pct, b.pct)
-                : d3.descending(a.pct, b.pct)
-      );
+      .filter(d=>d.activeTot &&
+                 (pctMode==="gte"?d.pct*100>=pctThresh:d.pct*100<=pctThresh))
+      .sort((a,b)=>sortAsc?d3.ascending(a.pct,b.pct):d3.descending(a.pct,b.pct));
 
     d3.select("#lic-count").text(`${licStats.length} licences displayed`);
 
-    const radius = d3.scaleSqrt()
-      .domain([
-        d3.min(licStats, d => d.activeTot) || 1,
-        d3.max(licStats, d => d.activeTot) || 1
-      ])
-      .range([minR, maxR]);
+    /* render ---------------------------------------------------------- */
+    const vw=document.body.clientWidth,
+          cols=Math.max(1,Math.floor((vw-leftMargin)/cardW));
+    const radius=d3.scaleSqrt().domain([1,d3.max(licStats,d=>d.activeTot)||1])
+                   .range([minR,maxR]);
+    const pie=d3.pie().value(d=>d.value).sort(null);
 
-    /* SVG canvas */
-    const rowsN = Math.ceil(licStats.length / cols);
-    svg.attr("viewBox", `0 0 ${vw} ${rowsN * cardH + 100}`)
-       .selectAll("*").remove();
+    const svg=d3.select("#chart")
+      .attr("viewBox",`0 0 ${vw} ${Math.ceil(licStats.length/cols)*cardH+100}`);
+    svg.selectAll("*").remove();
+    const g=svg.append("g").attr("transform",`translate(${leftMargin},0)`);
 
-    const g = svg.append("g")
-                 .attr("transform", `translate(${leftMargin},0)`);
+    const card=g.selectAll("g.card").data(licStats).enter().append("g").attr("class","card")
+      .attr("transform",(d,i)=>{
+        const col=i%cols,row=Math.floor(i/cols),R=radius(d.activeTot);
+        return`translate(${col*cardW+R},${row*cardH+R+40})`;
+      });
 
-    /* ── CARDS ── */
-    const cards = g.selectAll("g.card")
-      .data(licStats)
-      .enter().append("g")
-        .attr("class", "card")
-        .attr("transform", (d, i) => {
-          const col = i % cols,
-                row = Math.floor(i / cols),
-                R   = radius(d.activeTot);
-          return `translate(${col * cardW + R},
-                            ${row * cardH + R + 40})`;
-        });
+    card.append("circle").attr("r",d=>radius(d.activeTot)).attr("fill","#fff").attr("stroke","#ddd");
 
-    cards.append("circle")
-      .attr("r", d => radius(d.activeTot))
-      .attr("fill", "#fff")
-      .attr("stroke", "#ddd");
-
-    /* ── PIE SLICES ── */
-    cards.each(function (d) {
-      const R   = radius(d.activeTot),
-            arc = d3.arc()
-                     .innerRadius(+document
-                       .querySelector('input[name=hole]:checked').value)
-                     .outerRadius(R - 2);
-
-      const data = degrees.map(k => ({
-        key:   k,
-        value: rolled.get(d.lic).get(k) || 0,
-        on:    active.has(k)
-      }));
-
-      d3.select(this).selectAll("path")
-        .data(pie(data), s => s.data.key)
-        .join("path")
-          .attr("fill", s => s.data.on ? colour(s.data.key) : "#fff")
-          .attr("stroke", s => s.data.on ? "#fff" : "#ccc")
+    card.each(function(d){
+      const R=radius(d.activeTot),arc=d3.arc().innerRadius(0).outerRadius(R-2);
+      const data=degrees.map(k=>({key:k,value:rolled.get(d.lic).get(k)||0,on:active.has(k)}));
+      d3.select(this).selectAll("path").data(pie(data),s=>s.data.key).join("path")
+        .attr("fill",s=>s.data.on?colour(s.data.key):"#fff")
+        .attr("stroke",s=>s.data.on?"#fff":"#ccc")
         .transition().duration(400)
-          .attrTween("d", function (s) {
-            const i = d3.interpolate(this._current || s, s);
-            this._current = i(1);
-            return t => arc(i(t));
-          });
+        .attrTween("d",function(s){
+          const i=d3.interpolate(this._current||s,s);this._current=i(1);return t=>arc(i(t));
+        });
     });
 
-    /* ── LABELS ── */
-    cards.selectAll("text.label")
-      .data(d => [d])
-      .join(enter => enter.append("text").attr("class", "label"))
-        .attr("y", d => radius(d.activeTot) + 20)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "16px")
-        .each(function (d) {
-          const boxW = Math.max(120, radius(d.activeTot) * 1.8),
-                sel  = d3.select(this).text(null);
-
-          sel.append("tspan").attr("x", 0)
-             .text(`${(d.pct * 100).toFixed(0)} %`);
-          sel.append("tspan").attr("x", 0).attr("dy", "1.2em")
-             .text(`${d.activeTot} of ${d.total}`);
-          sel.append("tspan").attr("x", 0).attr("dy", "1.2em")
-             .attr("font-weight", "700")
-             .call(span => wrap(span, d.lic, boxW));
+    card.selectAll("text.label").data(d=>[d])
+      .join(enter=>enter.append("text").attr("class","label"))
+        .attr("y",d=>radius(d.activeTot)+20)
+        .attr("text-anchor","middle").attr("font-size","16px")
+        .each(function(d){
+          const w=Math.max(120,radius(d.activeTot)*1.8);
+          const sel=d3.select(this).text(null);
+          sel.append("tspan").attr("x",0).text(`${(d.pct*100).toFixed(0)} %`);
+          sel.append("tspan").attr("x",0).attr("dy","1.2em").text(`${d.activeTot} of ${d.total}`);
+          sel.append("tspan").attr("x",0).attr("dy","1.2em").attr("font-weight","700")
+             .call(span=>wrap(span,d.lic,w));
         });
 
-    /* tooltips */
-    cards.selectAll("path")
-         .on("mouseover", (e, s) =>
-            showTip(e, s.data.key, s.data.value))
-         .on("mouseout",  hideTip);
+    card.selectAll("path")
+        .on("mouseover",(e,s)=>showTip(e,`${s.data.key}: ${s.data.value}`))
+        .on("mouseout",()=>d3.select("#tip").style("opacity",0));
   }
 
-  /* ── HELPERS ── */
-  function wrap(tspanSel, str, width) {
-    const words = str.split(/\s+/);
-    tspanSel.text(null);
-    let line = [], tspan = tspanSel;
-    words.forEach(w => {
-      line.push(w); tspan.text(line.join(" "));
-      if (tspan.node().getComputedTextLength() > width) {
-        line.pop(); tspan.text(line.join(" "));
-        line = [w];
-        tspan = tspanSel.append("tspan")
-                        .attr("x", 0).attr("dy", "1.2em")
-                        .text(w);
+  /* helpers -------------------------------------------------------------- */
+  function wrap(ts,str,w){
+    const words=str.split(/\s+/); ts.text(null);
+    let line=[],t=ts;
+    words.forEach(wd=>{
+      line.push(wd); t.text(line.join(" "));
+      if(t.node().getComputedTextLength()>w){
+        line.pop(); t.text(line.join(" "));
+        line=[wd];  t=ts.append("tspan").attr("x",0).attr("dy","1.2em").text(wd);
       }
     });
   }
-
-  function showTip(e, l, v) {
-    d3.select("#tip").style("opacity", .9)
-      .html(`<strong>${l}</strong><br>${v} source${v === 1 ? "" : "s"}`)
-      .style("left",  (e.pageX + 10) + "px")
-      .style("top",   (e.pageY - 28) + "px");
+  function showTip(evt,html){
+    d3.select("#tip").style("opacity",.9).html(html)
+      .style("left",(evt.pageX+10)+"px")
+      .style("top",(evt.pageY-28)+"px");
   }
-  function hideTip()  { d3.select("#tip").style("opacity", 0); }
-  const debounce = (fn, ms) => {
-    let id; return (...a) => {
-      clearTimeout(id); id = setTimeout(() => fn(...a), ms);
-    };
-  };
+  const debounce=(fn,ms)=>{let id;return(...a)=>{
+      clearTimeout(id); id=setTimeout(()=>fn(...a),ms);
+  }};
 });
 </script>
 </body>
